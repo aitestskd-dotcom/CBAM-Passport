@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Smelter carbon twin: live carbon intensity of our aluminium</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..800&display=swap">
+<style>
+:root{--bg:#eef1f4;--panel:#fff;--ink:#14212b;--mute:#566673;--rule:#d3dbe1;--acc:#1f5f8b;--c-elec:#2a6f97;--c-anode:#b5651d;--c-pfc:#7b5ea7;--c-other:#7d8c97;--c-alum:#5f8f5a;--ok:#2f7d4f;--warn:#a85a14;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e151b;--panel:#16212a;--ink:#e7eef3;--mute:#9aaab6;--rule:#2a3a46;--acc:#6cb4e4;--c-elec:#5aa9d6;--c-anode:#d98a45;--c-pfc:#a58bd0;--c-other:#8fa0ac;--c-alum:#7fb87a;--ok:#6fc28f;--warn:#e0a060;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e151b;--panel:#16212a;--ink:#e7eef3;--mute:#9aaab6;--rule:#2a3a46;--acc:#6cb4e4;--c-elec:#5aa9d6;--c-anode:#d98a45;--c-pfc:#a58bd0;--c-other:#8fa0ac;--c-alum:#7fb87a;--ok:#6fc28f;--warn:#e0a060;color-scheme:dark}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:16px/1.55 Archivo,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-variant-numeric:tabular-nums}
+main{max-width:980px;margin:0 auto;padding:28px 20px 56px}
+h1{font-size:clamp(22px,4vw,30px);line-height:1.2;margin:0 0 4px;font-weight:700}
+h2{font-size:20px;margin:0 0 4px;font-weight:700}
+p{margin:0}
+.sub{color:var(--mute);max-width:62ch}
+.top{display:flex;gap:16px;justify-content:space-between;align-items:flex-start;flex-wrap:wrap}
+.live{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border:1px solid var(--rule);border-radius:999px;background:var(--panel);font-size:14px;white-space:nowrap}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--ok)}
+@media (prefers-reduced-motion:no-preference){.dot{animation:pulse 2s ease-in-out infinite}@keyframes pulse{50%{opacity:.35}}}
+.demo{margin-top:18px;padding:10px 14px;border-left:4px solid var(--warn);background:var(--panel);font-size:14px;color:var(--mute)}
+section{padding:34px 0 0;margin-top:34px;border-top:1px solid var(--rule)}
+.hero{border-top:0;margin-top:26px;padding-top:0}
+.big{font-size:clamp(68px,17vw,148px);font-weight:800;font-stretch:112%;line-height:.95;letter-spacing:-.02em;margin:6px 0 2px}
+.unit{font-size:clamp(16px,2.6vw,20px);color:var(--mute)}
+.track{position:relative;height:34px;margin:30px 0 56px;background:var(--panel);border:1px solid var(--rule);border-radius:4px;display:flex;overflow:visible}
+.track>span{height:100%;transition:width .6s ease}
+.track>span:first-child{border-radius:3px 0 0 3px}
+.mark{position:absolute;top:-10px;bottom:-10px;width:0;border-left:2px dashed var(--ink)}
+.mark em{position:absolute;top:100%;left:0;transform:translateX(-50%);font-style:normal;font-size:12.5px;color:var(--mute);text-align:center;width:120px;margin-top:4px;line-height:1.25}
+ul.legend{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:0 28px}
+.legend li{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--rule)}
+.legend i{width:14px;height:14px;border-radius:3px;flex:none}
+.legend span{flex:1}.legend small{color:var(--mute)}
+.legend b{font-weight:700}
+dl.tel{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:18px 24px;margin:18px 0 0}
+dl.tel div{border-left:3px solid var(--rule);padding-left:12px}
+dt{font-size:13.5px;color:var(--mute)}
+dd{margin:0;font-size:24px;font-weight:700}
+dd small{font-size:14px;font-weight:500;color:var(--mute)}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:36px;align-items:start}
+@media (max-width:760px){.two{grid-template-columns:1fr}}
+.spark{width:100%;height:110px;display:block;margin-top:14px;color:var(--acc)}
+.ctl{display:grid;gap:14px;margin-top:16px}
+label{display:flex;justify-content:space-between;gap:12px;font-size:15px}
+label b{font-weight:700}
+input[type=range]{width:100%;accent-color:var(--acc);margin:4px 0 0}
+select,input[type=text]{width:100%;font:inherit;padding:10px 12px;border:1px solid var(--rule);border-radius:6px;background:var(--panel);color:var(--ink)}
+button{font:inherit;padding:10px 16px;border:1px solid var(--acc);border-radius:6px;background:var(--acc);color:#fff;cursor:pointer;font-weight:600}
+button.alt{background:transparent;color:var(--acc)}
+:root[data-theme="dark"] button:not(.alt){color:#0e151b}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) button:not(.alt){color:#0e151b}}
+:focus-visible{outline:3px solid var(--acc);outline-offset:2px}
+.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.row input{flex:1;min-width:200px;width:auto}
+.res{margin-top:18px;padding:16px 18px;background:var(--panel);border:1px solid var(--rule);border-radius:6px}
+.res .n{font-size:40px;font-weight:800;line-height:1.1}
+.delta{font-weight:700}.good{color:var(--ok)}.bad{color:var(--warn)}
+dl.pp{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;margin:12px 0 0}
+dl.pp dt{margin:0}dl.pp dd{font-size:16px;font-weight:600}
+.scroll{overflow-x:auto}
+.foot{margin-top:40px;font-size:13.5px;color:var(--mute);max-width:80ch}
+[hidden]{display:none!important}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px 20px;margin-top:14px}
+.pgrid label{display:block;font-size:14px;color:var(--mute)}
+input[type=number]{width:100%;font:inherit;padding:8px 10px;margin-top:4px;border:1px solid var(--rule);border-radius:6px;background:var(--panel);color:var(--ink)}
+details{margin-top:14px}summary{cursor:pointer;font-weight:600}
+button.alt[aria-pressed="true"]{background:var(--acc);color:var(--bg)}
+label.chk{display:flex;justify-content:flex-start;gap:8px;font-size:14px;color:var(--mute)}
+label.chk input{margin-top:4px}
+button{min-height:44px}
+select,input[type=text],input[type=number]{width:100%;font:inherit;padding:10px 12px;margin:4px 0 0;border:1px solid var(--rule);border-radius:6px;background:var(--panel);color:var(--ink);min-height:44px}
+.row select,.row input{margin:0}
+#tabs button{flex:1 1 150px}
+.big{margin-left:-.05em}
+.legend b{min-width:3.4em;text-align:right}
+.two>*{min-width:0}
+.ctl>div>label{align-items:baseline}
+table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+th,td{padding:9px 10px;border-bottom:1px solid var(--rule);text-align:left;white-space:nowrap}
+th{font-size:13.5px;color:var(--mute);font-weight:600}
+.r{text-align:right}
+tr.cur td{font-weight:700}
+.lotbtn{min-height:36px;padding:4px 10px;font-size:14px}
+.res+.scroll,.scroll+.res{margin-top:18px}
+.hd{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.brand{font-weight:800;font-stretch:112%;font-size:20px}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 18px;border-radius:6px;border:1px solid var(--acc);background:var(--acc);color:var(--bg);font-weight:600;text-decoration:none}
+.btn.alt{background:transparent;color:var(--acc)}
+.pitch{padding:40px 0 8px}
+.pitch h1{font-size:clamp(32px,6.4vw,58px);line-height:1.05;font-weight:800;font-stretch:112%;letter-spacing:-.02em;max-width:17ch;margin:0 0 14px}
+.lead{font-size:clamp(17px,2.4vw,20px);color:var(--mute);max-width:60ch;margin-bottom:20px}
+.roles{display:grid;grid-template-columns:repeat(3,1fr);margin-top:34px}
+.roles>div{padding:4px 22px 4px 18px;border-left:3px solid var(--rule)}
+@media (max-width:760px){.roles{grid-template-columns:1fr;gap:22px}}
+.roles h3{margin:0 0 6px;font-size:18px}
+.roles p{color:var(--mute);margin-bottom:12px;font-size:15px}
+#ttl{font-size:clamp(22px,4vw,30px);margin:0 0 4px}
+.pl{margin-top:10px}
+.res h3.blk{margin:0 0 6px;font-size:17px}
+.res h3.blk~h3.blk{margin-top:22px;padding-top:18px;border-top:1px solid var(--rule)}
+.wrap td,.wrap th{white-space:normal;vertical-align:top}
+</style>
+</head>
+<body>
+<main>
+<header class="hd"><span class="brand">Carbon Twin</span><a class="btn" href="#demo-req">Book a demo</a></header>
+<section class="pitch" style="border:0;margin:0">
+  <h1>Know the carbon cost of every tonne before it crosses the border</h1>
+  <p class="lead">Live carbon passports for UAE aluminium, with the EU and UK CBAM cost worked out for producers, importers and traders.</p>
+  <div class="row"><a class="btn" href="#demo-req">Book a demo</a><a class="btn alt" href="#live">Try the live demo</a></div>
+  <div class="roles">
+    <div><h3>Producers</h3><p>Publish a live carbon passport for every lot. Test power-mix, PFC and recycled-content changes, and see EU and UK CBAM exposure by customer.</p><a class="btn alt" href="#demo-req" data-role="producer">Demo for producers</a></div>
+    <div><h3>Importers</h3><p>See the CBAM cost of a shipment before you buy. Compare producer data with default values and estimate what to charge back to the producer.</p><a class="btn alt" href="#demo-req" data-role="importer">Demo for importers</a></div>
+    <div><h3>Traders</h3><p>Quote CBAM-adjusted prices in seconds, see EU and UK side by side, and pick the lowest-carbon lot for each destination.</p><a class="btn alt" href="#demo-req" data-role="trader">Demo for traders</a></div>
+  </div>
+</section>
+<div class="top" id="live" style="margin-top:46px">
+  <div>
+    <h2 id="ttl">Live demo</h2>
+    <p class="sub">A digital twin of the plant behind your material. Choose a facility, load reference or your own parameters, and see emissions update live.</p>
+  </div>
+  <div class="live" role="status"><span class="dot"></span><span>Live feed, updated <span id="clock">now</span></span></div>
+</div>
+<p class="demo">Demo data. The feed is simulated and the factors are illustrative. In a customer account, the feed comes from the plant’s own control system, energy meters and emissions records.</p>
+
+
+<section class="hero" aria-labelledby="h-cfg" style="margin-top:22px">
+  <h2 id="h-cfg">Choose a facility</h2>
+  <div class="row" id="tabs">
+    <button class="alt" type="button" data-f="smelter" aria-pressed="true">Aluminium smelter</button>
+    <button class="alt" type="button" data-f="refinery" aria-pressed="false">Alumina refinery</button>
+    <button class="alt" type="button" data-f="recycle" aria-pressed="false">Recycling plant</button>
+  </div>
+  <div class="row"><select id="profile" aria-label="Parameter profile" style="max-width:320px"><option value="ega">UAE reference (EGA public figures)</option><option value="demo">Generic demo</option></select><button class="alt" id="copy" type="button">Copy parameters</button></div>
+  <p class="sub" id="ref" style="margin-top:10px"></p>
+  <details><summary>Edit plant parameters</summary><div class="pgrid" id="params"></div></details>
+</section>
+<section aria-labelledby="h-now">
+  <h2 id="h-now">Right now</h2>
+  <div class="big" id="total">0.0</div>
+  <div class="unit" id="unit"></div>
+  <div class="track" id="track" aria-hidden="true"></div>
+  <ul class="legend" id="legend"></ul>
+</section>
+
+<section aria-labelledby="h-tel">
+  <div class="two">
+    <div>
+      <h2 id="h-tel">What the potline is doing</h2>
+      <p class="sub">The twin recalculates emissions from these readings every two seconds.</p>
+      <dl class="tel" id="tel"></dl>
+    </div>
+    <div>
+      <h2>Last two minutes</h2>
+      <p class="sub">Total intensity, t CO₂e per tonne.</p>
+      <svg class="spark" viewBox="0 0 300 80" preserveAspectRatio="none" role="img" aria-label="Trend of live carbon intensity"><polyline id="line" fill="none" stroke="currentColor" stroke-width="2.5" vector-effect="non-scaling-stroke" points=""/></svg>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="h-sc">
+  <h2 id="h-sc">Try different parameters</h2>
+  <p class="sub">Move the sliders to see how emissions respond. Nothing here changes the live feed.</p>
+  <div class="two">
+    <div class="ctl" id="scn"></div>
+    <div class="res" aria-live="polite"><div class="unit">Scenario result</div><div class="n" id="sc-total">0.0</div><div class="unit" id="sc-unit"></div><p style="margin-top:8px" id="sc-delta"></p><div class="row"><button class="alt" id="reset" type="button">Match live readings</button></div></div>
+  </div>
+</section>
+
+<section aria-labelledby="h-cb">
+  <h2 id="h-cb">EU and UK CBAM</h2>
+  <p class="sub">Embedded emissions and an indicative carbon border cost for metal sold into the EU and the UK. It is not a CBAM declaration, and a verifier must confirm the figures.</p>
+  <div class="row" id="cb-view">
+    <button class="alt" type="button" data-v="producer" aria-pressed="true">Producer view</button>
+    <button class="alt" type="button" data-v="importer" aria-pressed="false">Importer view</button>
+    <button class="alt" type="button" data-v="trader" aria-pressed="false">Trader view</button>
+  </div>
+  <div class="two" style="margin-top:18px">
+    <div class="ctl" id="cb-ctl">
+      <div><label for="cb-j">Jurisdiction</label><select id="cb-j"><option value="both">EU and UK</option><option value="eu">EU only</option><option value="uk">UK only</option></select></div>
+      <div><label for="cb-yr">EU import year</label><select id="cb-yr"></select></div>
+      <div><label for="cb-p">EU certificate price, € per t CO₂e</label><input type="number" id="cb-p" value="75" min="0" step="1"></div>
+      <div><label for="cb-b">EU free-allocation benchmark, t CO₂e per t</label><input type="number" id="cb-b" value="1.5" min="0" step="0.01"></div>
+      <div><label for="cb-u">UK CBAM rate, £ per t CO₂e (latest quarterly rate)</label><input type="number" id="cb-u" value="40" min="0" step="1"></div>
+      <div hidden><label for="cb-t">Shipment size, tonnes</label><input type="number" id="cb-t" value="1000" min="0" step="10"></div>
+      <div hidden><label for="cb-s">Share charged back to the producer, %</label><input type="number" id="cb-s" value="100" min="0" max="100" step="5"></div>
+      <div hidden><label for="cb-d">Default value if producer data is missing, t CO₂e per t (optional)</label><input type="number" id="cb-d" min="0" step="0.1" placeholder="Enter the published default"></div>
+      <label class="chk"><input type="checkbox" id="cb-i"><span>EU only: also count purchased electricity (indirect emissions). Most guidance treats aluminium as direct-only in 2026, so leave this off for a standard view.</span></label>
+    </div>
+    <div class="res" id="cb-out" aria-live="polite"></div>
+  </div>
+  <div id="cb-tab" hidden style="margin-top:22px"></div>
+</section>
+
+
+<section aria-labelledby="h-lot">
+  <h2 id="h-lot">Carbon passports by lot</h2>
+  <p class="sub">Open a lot from the register, or enter a lot or cast number from your delivery note.</p>
+  <div class="row">
+    <input type="text" id="lot" placeholder="For example CAST-0427-18" aria-label="Lot or cast number" autocomplete="off">
+    <button type="button" id="go">Show passport</button>
+  </div>
+  <div class="scroll" style="margin-top:16px"><table id="reg"></table></div>
+  <div class="res scroll" id="pass" aria-live="polite">Your lot’s emissions will appear here.</div>
+</section>
+
+<section aria-labelledby="h-rules">
+  <h2 id="h-rules">The rules this covers</h2>
+  <div class="scroll"><table class="wrap"><thead><tr><th>Rule</th><th>Status</th><th>What it asks for</th></tr></thead><tbody>
+    <tr><td><b>EU CBAM</b></td><td>Definitive period since 1 January 2026</td><td>Importers surrender certificates for 2026 imports in 2027. The CBAM factor rises from 2.5% in 2026 to 100% in 2034. An annual 50-tonne threshold applies, and aluminium counts direct emissions.</td></tr>
+    <tr><td><b>UK CBAM</b></td><td>Starts 1 January 2027</td><td>Covers aluminium, cement, fertiliser, hydrogen, and iron and steel. Direct emissions only until at least 2029. HM Treasury sets a quarterly sector rate from the UK ETS price. Registration at £50,000 of goods in 12 months, and one default value per good.</td></tr>
+    <tr><td><b>UAE climate law</b></td><td>In force since 30 May 2025</td><td>Federal Decree-Law No. 11 of 2024 requires entities that emit to measure, report and reduce emissions. Full compliance was due by 30 May 2026 unless extended, with reported fines of AED 50,000 to 2 million.</td></tr>
+  </tbody></table></div>
+  <p class="sub" style="margin-top:10px">Check the official texts before relying on any figure, starting with the <a href="https://www.gov.uk/government/publications/introduction-of-carbon-border-adjustment-mechanism/carbon-border-adjustment-mechanism">UK government policy paper</a>.</p>
+</section>
+
+<section id="demo-req" aria-labelledby="h-req">
+  <h2 id="h-req">Book a demo</h2>
+  <p class="sub">Tell us who you are and we will set the twin up with your plant or shipment data.</p>
+  <div class="ctl" style="max-width:520px">
+    <div><label for="rq-c">Company</label><input type="text" id="rq-c" autocomplete="organization"></div>
+    <div><label for="rq-r">I am a</label><select id="rq-r"><option value="producer">Producer</option><option value="importer">Importer</option><option value="trader">Trader</option></select></div>
+    <div><label for="rq-m">What would you like to see</label><input type="text" id="rq-m" placeholder="For example EU and UK CBAM cost for our billets"></div>
+    <div><button type="button" id="rq-go">Request a demo</button></div>
+  </div>
+</section>
+<p class="foot">How it works: each facility model converts its parameters into t CO₂e per tonne of product (smelter: cell energy, anode carbon, PFC slope method and alumina supply; refinery: fuel, power, bauxite and chemicals; recycling: melting fuel, power, scrap preparation and primary metal added). EU CBAM: certificates = embedded emissions minus benchmark × (1 − CBAM factor), priced at the certificate price. UK CBAM: direct emissions × the sector rate you enter. Parameter values are illustrative and must be replaced with measured, verified data. EGA is named only to cite its public figures, and this product is not affiliated with or endorsed by EGA. Lot records are generated for demonstration.</p>
+</main>
+
+<script>
+const CONTACT="";
+const $=id=>document.getElementById(id);
+const f1=x=>x.toFixed(1),f2=x=>x.toFixed(2);
+const Q=(k,l,u,min,max,s,a,b)=>({k,l,u,min,max,s,v:{ega:a,demo:b}});
+const M={
+smelter:{u:"t CO₂e per tonne of aluminium, including alumina supply",sc:20,thr:4,mk:[[4,"Low-carbon threshold, 4"],[14,"Global average, about 14"]],N:["V","CE","AEF","C"],
+ prod:["Primary foundry alloy","Extrusion billet","Sheet ingot","T-bar"],
+ comps:[["elec","Electricity","--c-elec","Scope 1 or 2"],["anode","Anodes and baking","--c-anode","Scope 1"],["pfc","PFC emissions","--c-pfc","Scope 1"],["other","Casthouse and other fuel","--c-other","Scope 1"],["alum","Alumina supply","--c-alum","Scope 3"]],
+ P:[Q("V","Cell voltage","V",3.8,4.6,.01,4.15,4.15),Q("CE","Current efficiency","%",88,96,.1,94,94),Q("AEF","Anode effects","per pot-day",.01,.5,.01,.05,.06),Q("C","Clean power share","%",0,100,1,8,40),Q("G","Grid import share","%",0,100,1,0,5),Q("EFg","Gas power emission factor","t/MWh",.3,.9,.01,.53,.46),Q("ON","Gas power generated on site","%",0,100,1,100,0),Q("NC","Net carbon per tonne","t C",.38,.46,.01,.41,.41),Q("AL","Alumina emission factor","t CO₂e/t",.4,3,.05,1.2,1.0)],
+ calc(p){const E=2.98*p.V/(p.CE/100)*1.02,c=p.C/100,n=Math.min(p.G/100,1-c),g=1-c-n;
+  const gp=E*g*p.EFg,elec=gp+E*(n*.52+c*.03),anode=p.NC*3.667+.2,cf=.143*p.AEF*2,pfc=cf*(7390+.121*12200)/1000,other=.25,alum=1.93*p.AL,on=gp*p.ON/100;
+  return{E,g,elec,anode,pfc,other,alum,dir:anode+pfc+other+on,ind:elec-on,pre:0,total:elec+anode+pfc+other+alum}},
+ tel:(p,r)=>[["Cell voltage",f2(p.V)," V"],["Current efficiency",f1(p.CE)," %"],["Energy per tonne",Math.round(r.E*1000)," kWh"],["Clean power share",Math.round(p.C)," %"],["Anode effects",f2(p.AEF)," per pot-day"],["Gas-fired power",Math.round(r.g*100)," %"]]},
+refinery:{u:"t CO₂e per tonne of alumina",sc:3,mk:[],N:["HEAT","EL"],prod:["Smelter-grade alumina"],
+ comps:[["heat","Process heat and calcination","--c-anode","Scope 1"],["elec","Electricity","--c-elec","Scope 1 or 2"],["bx","Bauxite supply","--c-alum","Scope 3"],["chem","Chemicals and lime","--c-other","Scope 3"]],
+ P:[Q("HEAT","Fuel per tonne","GJ",8,14,.1,10.5,11),Q("EL","Electricity per tonne","MWh",.1,.6,.01,.3,.3),Q("EF","Power emission factor","t/MWh",.05,.9,.01,.5,.6),Q("ON","Power generated on site","%",0,100,1,100,0),Q("BX","Bauxite per tonne of alumina","t",2,3.2,.05,2.5,2.5),Q("BXEF","Bauxite mining and shipping","t CO₂e/t",.02,.4,.01,.12,.15),Q("CH","Chemicals and lime","t CO₂e/t",.05,.6,.01,.2,.25)],
+ calc(p){const heat=p.HEAT*.0561,elec=p.EL*p.EF,bx=p.BX*p.BXEF,chem=p.CH;return{heat,elec,bx,chem,dir:heat+elec*p.ON/100,ind:elec*(1-p.ON/100),pre:0,total:heat+elec+bx+chem}},
+ tel:(p,r)=>[["Fuel per tonne",f1(p.HEAT)," GJ"],["Electricity",Math.round(p.EL*1000)," kWh per t"],["Bauxite per tonne",f2(p.BX)," t"],["Direct share",Math.round(r.dir/r.total*100)," %"]]},
+recycle:{u:"t CO₂e per tonne of recycled metal",sc:2,mk:[],N:["FU","EL"],prod:["Recycled billet","Recycled T-bar","Foundry ingot"],
+ comps:[["fuel","Melting fuel","--c-anode","Scope 1"],["elec","Electricity","--c-elec","Scope 2"],["prep","Scrap collection and sorting","--c-other","Scope 3"],["prim","Primary metal added","--c-alum","Scope 3"]],
+ P:[Q("FU","Melting fuel per tonne","GJ",1.5,6,.1,3.2,3.5),Q("EL","Electricity per tonne","MWh",.05,.5,.01,.15,.2),Q("EF","Power emission factor","t/MWh",.02,.9,.01,.35,.45),Q("PRE","Scrap collection and sorting","t CO₂e/t",.05,.5,.01,.15,.2),Q("PM","Primary metal added","%",0,100,1,15,20),Q("PEF","Primary metal emission factor","t CO₂e/t",2,16,.1,4,11)],
+ calc(p){const fuel=p.FU*.0561,elec=p.EL*p.EF,prep=p.PRE,prim=p.PM/100*p.PEF;return{fuel,elec,prep,prim,dir:fuel,ind:elec,pre:prim,total:fuel+elec+prep+prim}},
+ tel:(p,r)=>[["Melting fuel",f1(p.FU)," GJ per t"],["Electricity",Math.round(p.EL*1000)," kWh per t"],["Primary metal added",Math.round(p.PM)," %"],["Scrap input",100-Math.round(p.PM)," %"]]}
+};
+const NAMES={smelter:"aluminium smelter",refinery:"alumina refinery",recycle:"recycling plant"};
+const REF={ega:{
+ smelter:"EGA’s two smelters made about 2.7 million tonnes of hot metal in 2024. Its 2020 base-year cradle-to-gate intensity was 11.2 t CO₂e per tonne, with a 25% cut targeted by 2030, and its 2024 smelting and casting intensity was 32.4% below the global average. Values here are set to land near that baseline.",
+ refinery:"EGA’s Al Taweelah refinery made 2.40 million tonnes of alumina in 2025 against a 2 million tonne nameplate, from more than 5 million tonnes of bauxite. EGA does not publish the other inputs, so these values are illustrative.",
+ recycle:"EGA reports 185,000 tonnes per year of billet and T-bar capacity at its Al Taweelah recycling plant, and its US unit EGA Spectro Alloys has 165,000 tonnes per year, rising to 200,000 in 2027. Inputs here are illustrative."},
+ demo:"Generic demo values. Replace them with your own."};
+const YR=[[2026,.025],[2027,.05],[2028,.1],[2029,.225],[2030,.485],[2031,.61],[2032,.735],[2033,.86],[2034,1]];
+let fac="smelter",prof="ega",base={},live={},scn={},hist=[];
+const clamp=(x,a,b)=>Math.min(b,Math.max(a,x));
+const fmt=x=>M[fac].sc>5?f1(x):f2(x);
+function solar(){const d=new Date(),h=d.getHours()+d.getMinutes()/60;return Math.max(0,Math.sin(Math.PI*(h-6)/12));}
+function step(){const m=M[fac];m.N.forEach(k=>{const q=m.P.find(x=>x.k===k),sp=q.max-q.min;let t=base[k];if(fac==="smelter"&&k==="C")t=clamp(base.C+14*(solar()-.5),q.min,q.max);live[k]=clamp(live[k]+(t-live[k])*.2+(Math.random()-.5)*sp*.012,q.min,q.max);});const r=m.calc(live);hist.push(r.total);if(hist.length>60)hist.shift();return r;}
+function warm(){hist=[];for(let i=0;i<45;i++)step();}
+function buildParams(){const m=M[fac];$("params").innerHTML=m.P.map(q=>'<label>'+q.l+' ('+q.u+')<input type="number" data-k="'+q.k+'" min="'+q.min+'" max="'+q.max+'" step="'+q.s+'" value="'+base[q.k]+'"></label>').join("");
+ $("params").querySelectorAll("input").forEach(el=>el.addEventListener("input",()=>{const v=+el.value;if(el.value===""||isNaN(v))return;const k=el.dataset.k;base[k]=live[k]=scn[k]=v;syncScn();warm();draw(M[fac].calc(live));}));}
+function buildScn(){const m=M[fac];$("scn").innerHTML=m.P.map(q=>'<div><label for="s-'+q.k+'">'+q.l+' <b id="v-'+q.k+'"></b></label><input type="range" id="s-'+q.k+'" min="'+q.min+'" max="'+q.max+'" step="'+q.s+'"></div>').join("");
+ m.P.forEach(q=>$("s-"+q.k).addEventListener("input",e=>{scn[q.k]=+e.target.value;drawScn(M[fac].calc(live));}));syncScn();}
+function syncScn(){M[fac].P.forEach(q=>{$("s-"+q.k).value=scn[q.k];});}
+function load(){const m=M[fac];base={};m.P.forEach(q=>base[q.k]=q.v[prof]);live={...base};scn={...base};
+ $("ttl").textContent="Live demo: carbon intensity of a "+NAMES[fac];$("ref").textContent=prof==="ega"?REF.ega[fac]:REF.demo;
+ document.querySelectorAll("#tabs button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.f===fac));
+ Object.keys(REC).forEach(k=>delete REC[k]);buildParams();buildScn();warm();draw(m.calc(live));renderReg();$("pass").textContent="Your lot’s emissions will appear here.";}
+function drawScn(rl){const m=M[fac],r=m.calc(scn);
+ m.P.forEach(q=>$("v-"+q.k).textContent=(+scn[q.k]).toFixed(q.s<.1?2:q.s<1?1:0)+" "+q.u);
+ $("sc-total").textContent=fmt(r.total);$("sc-unit").textContent=m.u;const d=r.total-rl.total;
+ $("sc-delta").innerHTML='<span class="delta '+(d<=0?"good":"bad")+'">'+(d<=0?f2(-d)+" lower":f2(d)+" higher")+'</span> than the live reading of '+fmt(rl.total)+".";}
+let view="producer";
+const eur=x=>"€"+Math.round(x).toLocaleString(),gbp=x=>"£"+Math.round(x).toLocaleString();
+function cbamCalc(r){const f=YR[+$("cb-yr").value][1],price=+$("cb-p").value||0,B=+$("cb-b").value||0,inc=$("cb-i").checked,E=r.dir+r.pre+(inc?r.ind:0),free=B*(1-f),n=Math.max(0,E-free);return{f,price,B,inc,E,free,n,cost:n*price};}
+function ukCalc(r){const rate=+$("cb-u").value||0,E=r.dir+r.pre;return{rate,E,cost:E*rate};}
+const jset=()=>{const j=$("cb-j").value;return{eu:j!=="uk",uk:j!=="eu"};};
+function euBlock(r,t,sh,def){const c=cbamCalc(r),yr=YR[+$("cb-yr").value][0];
+ let h='<h3 class="blk">EU CBAM, '+yr+'</h3><div class="n">'+f2(c.E)+'</div><div class="unit">t CO₂e per tonne embedded</div><dl class="pp"><dt>Direct, at the plant</dt><dd>'+f2(r.dir)+'</dd>'+(r.pre?'<dt>Primary metal added</dt><dd>'+f2(r.pre)+'</dd>':'')+(c.inc?'<dt>Purchased electricity</dt><dd>'+f2(r.ind)+'</dd>':'')+'<dt>CBAM factor</dt><dd>'+(c.f*100).toFixed(1)+'%</dd><dt>Free allocation offset</dt><dd>'+f2(c.free)+'</dd><dt>Certificates per tonne</dt><dd>'+f2(c.n)+'</dd></dl>';
+ if(view==="producer")h+='<p class="pl"><span class="delta">'+eur(c.cost)+' per tonne</span>, or '+eur(c.cost*1000)+' per 1,000 tonnes. Your EU customers pay this, or ask you to cover it.</p>';
+ else if(view==="trader")h+='<p class="pl">Add <span class="delta">'+eur(c.cost)+' per tonne</span> to EU quotes.</p>';
+ else h+='<p class="pl">For '+t.toLocaleString()+' t imported in '+yr+':</p><dl class="pp"><dt>Certificates to surrender</dt><dd>'+Math.round(c.n*t).toLocaleString()+'</dd><dt>CBAM payable, approx</dt><dd>'+eur(c.cost*t)+'</dd><dt>Charged to the producer ('+Math.round(sh*100)+'%)</dt><dd>'+eur(c.cost*t*sh)+', or '+eur(c.cost*sh)+' per t</dd><dt>Importer keeps</dt><dd>'+eur(c.cost*t*(1-sh))+'</dd>'+(def>0?'<dt>Cost at default value '+f2(def)+'</dt><dd>'+eur(Math.max(0,def-c.free)*c.price*t)+'</dd>':'')+'</dl><p class="sub">The importer is the authorised declarant and surrenders the certificates the year after import. Charging the producer back is a contract term.</p>';
+ return h;}
+function ukBlock(r,t,sh,def){const c=ukCalc(r);
+ let h='<h3 class="blk">UK CBAM, from 2027</h3><div class="n">'+f2(c.E)+'</div><div class="unit">t CO₂e per tonne, direct emissions only</div><dl class="pp"><dt>Rate</dt><dd>£'+f2(c.rate)+' per t CO₂e</dd></dl>';
+ if(view==="producer")h+='<p class="pl"><span class="delta">'+gbp(c.cost)+' per tonne</span>, or '+gbp(c.cost*1000)+' per 1,000 tonnes.</p>';
+ else if(view==="trader")h+='<p class="pl">Add <span class="delta">'+gbp(c.cost)+' per tonne</span> to UK quotes.</p>';
+ else h+='<p class="pl">For '+t.toLocaleString()+' t:</p><dl class="pp"><dt>CBAM payable, approx</dt><dd>'+gbp(c.cost*t)+'</dd><dt>Charged to the producer ('+Math.round(sh*100)+'%)</dt><dd>'+gbp(c.cost*t*sh)+', or '+gbp(c.cost*sh)+' per t</dd><dt>Importer keeps</dt><dd>'+gbp(c.cost*t*(1-sh))+'</dd>'+(def>0?'<dt>Cost at default value '+f2(def)+'</dt><dd>'+gbp(def*c.rate*t)+'</dd>':'')+'</dl>';
+ return h+'<p class="sub" style="margin-top:8px">HM Treasury sets the rate each quarter per sector from the UK ETS price, so enter the latest rate. Registration applies from £50,000 of CBAM goods in 12 months.</p>';}
+function traderBlock(J,t){const cost=x=>J.eu?cbamCalc(x).cost:ukCalc(x).cost,sym=J.eu?eur:gbp,s=lots().sort((a,b)=>cost(a)-cost(b)),lo=s[0],hi=s[s.length-1],d=cost(hi)-cost(lo);
+ return '<h3 class="blk">Lot choice</h3><p>The lowest-carbon lot in the register is <b>'+lo.id+'</b> at '+sym(cost(lo))+' per t, and the highest is <b>'+hi.id+'</b> at '+sym(cost(hi))+' per t. Choosing the lowest saves '+sym(d)+' per t, or '+sym(d*t)+' on '+t.toLocaleString()+' t, on '+(J.eu?"EU":"UK")+' CBAM.</p>';}
+function drawCbam(r){const out=$("cb-out"),tab=$("cb-tab"),ref=fac==="refinery",J=jset(),imp=view==="importer";
+ const hide=(id,v)=>{$(id).parentElement.hidden=v;};
+ $("cb-view").hidden=ref;
+ hide("cb-t",view==="producer");hide("cb-s",!imp);hide("cb-d",!imp);hide("cb-yr",!J.eu);hide("cb-p",!J.eu);hide("cb-b",!J.eu);hide("cb-u",!J.uk);$("cb-i").closest("label").hidden=!J.eu;
+ document.querySelectorAll("#cb-view button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===view));
+ if(ref){$("cb-ctl").hidden=true;tab.hidden=true;out.innerHTML='<p>This model prices aluminium products only, so alumina carries no CBAM cost here. Its emissions reach customers through the alumina supply line of the smelter that uses it.</p>';return;}
+ $("cb-ctl").hidden=false;
+ const t=+$("cb-t").value||0,sh=clamp(+$("cb-s").value||0,0,100)/100,def=+$("cb-d").value||0;
+ out.innerHTML=(J.eu?euBlock(r,t,sh,def):"")+(J.uk?ukBlock(r,t,sh,def):"")+(view==="trader"?traderBlock(J,t):"");
+ if(imp&&J.eu){const c=cbamCalc(r),yr=YR[+$("cb-yr").value][0];
+  tab.hidden=false;tab.innerHTML='<h2 style="font-size:17px">EU cost as the CBAM factor rises</h2><p class="sub">Price and emissions held constant.</p><div class="scroll"><table><thead><tr><th>Year</th><th class="r">CBAM factor</th><th class="r">Certificates per t</th><th class="r">€ per t</th><th class="r">€ for shipment</th><th class="r">Charged to producer</th></tr></thead><tbody>'+YR.map(y=>{const n=Math.max(0,c.E-c.B*(1-y[1])),v=n*c.price;return '<tr'+(y[0]===yr?' class="cur"':'')+'><td>'+y[0]+'</td><td class="r">'+(y[1]*100).toFixed(1)+'%</td><td class="r">'+f2(n)+'</td><td class="r">'+eur(v)+'</td><td class="r">'+eur(v*t)+'</td><td class="r">'+eur(v*t*sh)+'</td></tr>';}).join("")+'</tbody></table></div>';}
+ else tab.hidden=true;}
+function draw(r){const m=M[fac];
+ $("total").textContent=fmt(r.total);$("unit").textContent=m.u;$("clock").textContent=new Date().toLocaleTimeString();
+ $("track").innerHTML=m.comps.map(c=>'<span style="width:'+(r[c[0]]/m.sc*100)+'%;background:var('+c[2]+')"></span>').join("")+m.mk.map(k=>'<div class="mark" style="left:'+(k[0]/m.sc*100)+'%"><em>'+k[1]+'</em></div>').join("");
+ $("legend").innerHTML=m.comps.map(c=>'<li><i style="background:var('+c[2]+')"></i><span>'+c[1]+' <small>'+c[3]+'</small></span><b>'+f2(r[c[0]])+'</b></li>').join("");
+ $("tel").innerHTML=m.tel(live,r).map(t=>'<div><dt>'+t[0]+'</dt><dd>'+t[1]+'<small>'+t[2]+'</small></dd></div>').join("");
+ const lo=Math.min(...hist)-.01*m.sc/10,hi=Math.max(...hist)+.01*m.sc/10;
+ $("line").setAttribute("points",hist.map((v,i)=>(i/59*300).toFixed(1)+","+(76-(v-lo)/(hi-lo)*72).toFixed(1)).join(" "));
+ drawScn(r);drawCbam(r);}
+function h32(s){let h=2166136261;for(const ch of s){h^=ch.charCodeAt(0);h=Math.imul(h,16777619);}return h>>>0;}
+const REC={},PFX={smelter:["CAST","BILLET"],refinery:["ALM"],recycle:["RCY"]};
+function rec(id){const k=fac+id;if(REC[k])return REC[k];const m=M[fac],h=h32(id),f=.94+(h%1200)/10000,r=m.calc(live),d=new Date();d.setDate(d.getDate()-((h>>>4)%30));
+ return REC[k]={id,h,prod:m.prod[h%m.prod.length],wt:+(18+((h>>>8)%700)/100).toFixed(1),date:d,total:r.total*f,dir:r.dir*f,pre:r.pre*f,ind:r.ind*f};}
+function lots(){const p=PFX[fac];return [...Array(8)].map((_,i)=>rec(p[i%p.length]+"-"+(1000+h32(fac+"x"+i)%9000)+"-"+String(i+3).padStart(2,"0"))).sort((a,b)=>b.date-a.date);}
+function renderReg(){const cb=fac!=="refinery",J=jset(),yr=YR[+$("cb-yr").value][0];
+ $("reg").innerHTML='<thead><tr><th>Lot</th><th>Product</th><th class="r">Tonnes</th><th>Date</th><th class="r">t CO₂e per t</th>'+(cb&&J.eu?'<th class="r">EU CBAM '+yr+', € per t</th>':'')+(cb&&J.uk?'<th class="r">UK CBAM, £ per t</th>':'')+'</tr></thead><tbody>'+lots().map(x=>'<tr><td><button class="alt lotbtn" type="button" data-lot="'+x.id+'">'+x.id+'</button></td><td>'+x.prod+'</td><td class="r">'+x.wt+'</td><td>'+x.date.toLocaleDateString()+'</td><td class="r">'+fmt(x.total)+'</td>'+(cb&&J.eu?'<td class="r">'+Math.round(cbamCalc(x).cost).toLocaleString()+'</td>':'')+(cb&&J.uk?'<td class="r">'+Math.round(ukCalc(x).cost).toLocaleString()+'</td>':'')+'</tr>').join("")+'</tbody>';}
+function lookup(raw){const m=M[fac],id=raw.trim().toUpperCase().replace(/[^A-Z0-9-]/g,""),out=$("pass");
+ if(!id){out.textContent="Enter a lot or cast number to see its carbon passport.";return;}
+ $("lot").value=id;const x=rec(id),J=jset();
+ const v=m.thr?(x.total<=m.thr?'<p style="margin-top:8px"><span class="delta good">Within the '+f1(m.thr)+' low-carbon threshold</span></p>':'<p style="margin-top:8px"><span class="delta bad">'+f1(x.total-m.thr)+' above the '+f1(m.thr)+' low-carbon threshold</span></p>'):"";
+ out.innerHTML='<div class="unit">Carbon passport</div><div class="n">'+fmt(x.total)+'</div><div class="unit">'+m.u+'</div>'+v
+  +'<dl class="pp"><dt>Lot</dt><dd>'+id+'</dd><dt>Facility</dt><dd>'+NAMES[fac]+'</dd><dt>Product</dt><dd>'+x.prod+'</dd><dt>Net weight</dt><dd>'+x.wt+' t</dd><dt>Date</dt><dd>'+x.date.toLocaleDateString()+'</dd><dt>Direct emissions</dt><dd>'+f2(x.dir)+' t CO₂e per t</dd>'
+  +(fac==="refinery"?"":'<dt>Indicative CBAM</dt><dd>'+(J.eu?eur(cbamCalc(x).cost)+' per t (EU)':"")+(J.eu&&J.uk?', ':"")+(J.uk?gbp(ukCalc(x).cost)+' per t (UK)':"")+'</dd>')
+  +'<dt>Reference</dt><dd>TWIN-'+x.h.toString(16).toUpperCase().padStart(8,"0")+'</dd></dl><p class="sub" style="margin-top:10px">Demo record, stamped when the lot was cast.</p>';}
+$("cb-yr").innerHTML=YR.map((y,i)=>'<option value="'+i+'">'+y[0]+'</option>').join("");
+["cb-j","cb-u","cb-yr","cb-p","cb-b","cb-i","cb-t","cb-s","cb-d"].forEach(id=>$(id).addEventListener("input",()=>{drawCbam(M[fac].calc(live));renderReg();}));
+document.querySelectorAll("#cb-view button").forEach(b=>b.addEventListener("click",()=>{view=b.dataset.v;drawCbam(M[fac].calc(live));}));
+$("reg").addEventListener("click",e=>{const b=e.target.closest("[data-lot]");if(b)lookup(b.dataset.lot);});
+document.querySelectorAll("#tabs button").forEach(b=>b.addEventListener("click",()=>{fac=b.dataset.f;load();$("pass").textContent="Your lot’s emissions will appear here.";}));
+$("profile").addEventListener("change",e=>{prof=e.target.value;load();});
+$("reset").addEventListener("click",()=>{scn={...live};syncScn();drawScn(M[fac].calc(live));});
+$("copy").addEventListener("click",async()=>{const b=$("copy");try{await navigator.clipboard.writeText(JSON.stringify({facility:fac,profile:prof,parameters:base},null,2));b.textContent="Copied";}catch(e){b.textContent="Copy not available";}setTimeout(()=>b.textContent="Copy parameters",1800);});
+$("go").addEventListener("click",()=>lookup($("lot").value));
+$("lot").addEventListener("keydown",e=>{if(e.key==="Enter")lookup($("lot").value);});
+document.querySelectorAll("[data-lot]").forEach(b=>b.addEventListener("click",()=>{$("lot").value=b.dataset.lot;lookup(b.dataset.lot);}));
+document.querySelectorAll("[data-role]").forEach(a=>a.addEventListener("click",()=>{$("rq-r").value=a.dataset.role;}));
+$("rq-go").addEventListener("click",()=>{const r=$("rq-r").value;location.href="mailto:"+CONTACT+"?subject="+encodeURIComponent("Carbon Twin demo request ("+r+")")+"&body="+encodeURIComponent("Company: "+$("rq-c").value+"\nRole: "+r+"\nInterested in: "+$("rq-m").value);});
+load();
+setInterval(()=>draw(step()),2000);
+</script>
+</body>
+</html>
